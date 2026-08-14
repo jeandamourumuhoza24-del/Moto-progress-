@@ -1,15 +1,12 @@
-# Moto Progress Rwanda — Web
+# Moto Progress Rwanda - Firebase + GitHub Pages
 
-Iyi ni web/PWA version ya Moto Progress. Ikoresha localStorage ku gikoresho; nta server/database ikenera kugira ngo igeragezwe.
+1. Kora Firebase project.
+2. Fungura Authentication > Sign-in method > Email/Password.
+3. Kora Firestore Database.
+4. Firebase Console > Project settings > Your apps > Web app.
+5. Kopiya Firebase config uyishyire muri `firebase-config.js`.
+6. Shyira files zose muri GitHub repository `Moto-progress-`.
+7. GitHub Pages: Settings > Pages > Deploy from branch > `main` > `/ (root)`.
+8. Shyira `firestore.rules` muri Firebase Firestore Rules.
 
-## Kuyitangaza kuri Firebase Hosting
-1. Shyiramo Firebase CLI kuri mudasobwa: `npm install -g firebase-tools`
-2. Injira: `firebase login`
-3. Injira muri folder: `cd moto-web`
-4. `firebase init hosting` (hitamo project ya Firebase, public directory `.`; ntuhindure index.html)
-5. `firebase deploy`
-
-Ibi bizaguha URL ya `PROJECT_ID.web.app`.
-
-## Icyitonderwa
-Version iyi ni working prototype/web app ifite data ibikwa muri browser. Niba ushaka users benshi, login na database ihuriweho na Android app, hakenerwa Firebase Authentication + Firestore.
+Icyitonderwa: Firebase Web config (apiKey n'izindi values za app) si password. Ntushyire muri code passwords cyangwa service-account private keys.
