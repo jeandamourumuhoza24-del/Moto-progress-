@@ -10,3 +10,11 @@
 8. Shyira `firestore.rules` muri Firebase Firestore Rules.
 
 Icyitonderwa: Firebase Web config (apiKey n'izindi values za app) si password. Ntushyire muri code passwords cyangwa service-account private keys.
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+// ...
+
+await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
