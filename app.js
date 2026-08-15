@@ -47,34 +47,41 @@ function monthExp(){return db.expenses.filter(x=>String(x.date||'').startsWith(t
 function profit(){return sum(monthTrips())-sum(monthExp())}
 function advice(){const t=monthTrips(),e=monthExp(),p=sum(t),x=sum(e);if(!t.length&&!e.length)return 'Tangira wandika urugendo n’amafaranga wakoresheje kugira ngo nkwereke aho amafaranga yawe ajya.';if(x>p*.35)return 'Amafaranga usohora ari hejuru ugereranyije n’ayo winjiza. Reba cyane cyane lisansi n’andi mafaranga yisubiramo.';if(t.length>=2)return `Umaze gukora ingendo ${t.length} muri uku kwezi, impuzandengo ni ${rwf(p/t.length)} kuri trip.`;return 'Komeza wandike amakuru yawe buri munsi; uko data yiyongera ni ko inama zizaba nziza.'}
 
+let authMode='login';
 function authScreen(message=''){
- return `<div class="content authbox"><div class="card section">
- <h1>🏍️ Moto Progress</h1><p class="muted">Injira cyangwa wiyandikishe kugira ngo amakuru yawe abikwe online.</p>
- ${message?`<div class="card" style="margin:10px 0"><b>${esc(message)}</b></div>`:''}
- <form class="form" onsubmit="login(event)">
- <label class="muted">Email<input id="authEmail" type="email" required placeholder="email@example.com"></label>
- <label class="muted">Password<input id="authPassword" type="password" minlength="6" required placeholder="Nibura inyuguti 6"></label>
- <button class="btn primary" type="submit">Kwinjira</button>
+ return `<div class="auth-page"><div class="auth-card">
+ <div class="auth-logo">🏍️</div><h1>Moto Progress</h1>
+ <p class="auth-sub">Gukurikirana amafaranga, kuzigama no guteza imbere moto.</p>
+ <div class="auth-tabs">
+ <button class="${authMode==='login'?'selected':''}" onclick="setAuthMode('login')">Kwinjira</button>
+ <button class="${authMode==='register'?'selected':''}" onclick="setAuthMode('register')">Fungura konti</button>
+ </div>${message?`<div class="auth-message">${esc(message)}</div>`:''}
+ <form class="form" onsubmit="${authMode==='login'?'login(event)':'register(event)'}">
+ ${authMode==='register'?`<label>Amazina yawe<input id="authName" type="text" required placeholder="Andika amazina yawe"></label>`:''}
+ <label>Email<input id="authEmail" type="email" required placeholder="email@example.com"></label>
+ <label>Password<input id="authPassword" type="password" minlength="6" required placeholder="Nibura inyuguti 6"></label>
+ ${authMode==='register'?`<label>Emeza password<input id="authPassword2" type="password" minlength="6" required placeholder="Subiramo password"></label>`:''}
+ <button class="btn primary auth-submit" type="submit">${authMode==='login'?'Kwinjira':'Fungura Konti'}</button>
  </form>
- <button class="btn dark" style="margin-top:10px" onclick="register()">Kwiyandikisha</button>
- <p class="muted" style="margin-top:12px">Iyo umaze kwinjira, trips, expenses, savings na raporo byawe bibikwa muri Firestore.</p>
+ <p class="auth-switch">${authMode==='login'?'Nta konti ufite?':'Usanzwe ufite konti?'} <button onclick="setAuthMode('${authMode==='login'?'register':'login'}')">${authMode==='login'?'Fungura konti':'Kwinjira'}</button></p>
+ <div class="auth-note">🔒 Amakuru yawe abikwa kuri konti yawe kandi ntayerekwa abandi.</div>
  </div></div>`
 }
+function setAuthMode(mode){authMode=mode;render()}
 async function login(e){
  e.preventDefault(); if(!firebaseReady)return alert('Firebase ntirategurwa. Shyiramo config muri firebase-config.js.');
  try{authBusy=true;const {auth,signInWithEmailAndPassword}=window.firebaseServices;
  await signInWithEmailAndPassword(auth,document.getElementById('authEmail').value.trim(),document.getElementById('authPassword').value);
  }catch(err){alert('Kwinjira byanze: '+(err.code||err.message))}finally{authBusy=false}
 }
-async function register(){
+async function register(e){
+ if(e)e.preventDefault();
  if(!firebaseReady)return alert('Firebase ntirategurwa. Shyiramo config muri firebase-config.js.');
- const email=document.getElementById('authEmail')?.value.trim(), pass=document.getElementById('authPassword')?.value;
- if(!email||!pass||pass.length<6)return alert('Andika email na password yibura inyuguti 6.');
- try{
-  const {auth,createUserWithEmailAndPassword,updateProfile}=window.firebaseServices;
-  const cred=await createUserWithEmailAndPassword(auth,email,pass);
-  await updateProfile(cred.user,{displayName:email.split('@')[0]});
- }catch(err){alert('Kwiyandikisha byanze: '+(err.code||err.message))}
+ const name=document.getElementById('authName')?.value.trim(), email=document.getElementById('authEmail')?.value.trim(), pass=document.getElementById('authPassword')?.value, pass2=document.getElementById('authPassword2')?.value;
+ if(!name||!email||!pass||pass.length<6)return alert('Uzuza ibisabwa byose. Password igomba kuba nibura inyuguti 6.');
+ if(pass!==pass2)return alert('Password ebyiri ntizihura.');
+ try{const {auth,createUserWithEmailAndPassword,updateProfile}=window.firebaseServices; const cred=await createUserWithEmailAndPassword(auth,email,pass); await updateProfile(cred.user,{displayName:name}); currentUser=cred.user; db=structuredClone(blank); db.user.name=name; await cloudSave(); render();}
+ catch(err){alert('Kwiyandikisha byanze: '+(err.code||err.message))}
 }
 async function logout(){if(firebaseReady)await window.firebaseServices.signOut(window.firebaseServices.auth)}
 
@@ -103,7 +110,7 @@ function render(){
  let body=page==='home'?home():page==='trips'?listPage('trips'):page==='expenses'?listPage('expenses'):page==='savings'?savings():page==='moto'?moto():reports();
  app.innerHTML=header()+body+nav();
 }
-window.go=go;window.modal=modal;window.closeModal=closeModal;window.login=login;window.register=register;window.logout=logout;window.saveTrip=saveTrip;window.saveExpense=saveExpense;window.saveSaving=saveSaving;window.saveGoal=saveGoal;window.saveMaintenance=saveMaintenance;window.saveReminder=saveReminder;window.contribute=contribute;
+window.go=go;window.modal=modal;window.closeModal=closeModal;window.login=login;window.register=register;window.setAuthMode=setAuthMode;window.logout=logout;window.saveTrip=saveTrip;window.saveExpense=saveExpense;window.saveSaving=saveSaving;window.saveGoal=saveGoal;window.saveMaintenance=saveMaintenance;window.saveReminder=saveReminder;window.contribute=contribute;
 
 window.addEventListener('firebase-ready',async()=>{
  firebaseReady=true;

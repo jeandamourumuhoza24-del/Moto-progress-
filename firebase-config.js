@@ -1,10 +1,9 @@
-// Shyiramo Firebase Web App config yawe hano.
-// Firebase Console → Project settings → Your apps → Web app → SDK setup and configuration.
-const firebaseConfig = {
-  apiKey: "SHYIRAMO_API_KEY",
-  authDomain: "SHYIRAMO_PROJECT_ID.firebaseapp.com",
-  projectId: "SHYIRAMO_PROJECT_ID",
-  storageBucket: "SHYIRAMO_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "SHYIRAMO_MESSAGING_SENDER_ID",
-  appId: "SHYIRAMO_APP_ID"
+// Firebase configuration for Moto Progress Rwanda
+export const firebaseConfig = {
+  apiKey: "AIzaSyAxaQIfr8Xa_u_kbuuPSsXxdMpCxDcwFBg",
+  authDomain: "moto-progress-rwanda.firebaseapp.com",
+  projectId: "moto-progress-rwanda",
+  storageBucket: "moto-progress-rwanda.firebasestorage.app",
+  messagingSenderId: "618982978698",
+  appId: "1:618982978698:web:971baeddb9987c770a6973"
 };
