@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#087f23">
+<meta name="description" content="Moto Progress Rwanda">
+<title>Moto Progress Rwanda</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+ <div>
+  <h1>🏍️ Moto Progress Rwanda</h1>
+  <small id="headerUser">Murakaza neza</small>
+ </div>
+ <button onclick="openProfile()" style="background:white;border:0;border-radius:50%;width:42px;height:42px">👤</button>
+</header>
+
+<div class="container">
+
+<!-- HOME -->
+<section id="home">
+
+ <div class="card">
+  <h2>Murakaza neza 👋</h2>
+  <p>Shaka motari, ingendo, marketplace, ubucuruzi no kwishyura ahantu hamwe.</p>
+ </div>
+
+ <input class="search" id="globalSearch" placeholder="🔎 Shaka serivisi...">
+
+ <div class="grid">
+
+  <button class="service" onclick="openPage('riders')">
+   <span class="ico">🏍️</span>
+   <b>Shaka Motari</b>
+   <small>Abamotari bakwegereye</small>
+  </button>
+
+  <button class="service" onclick="openPage('mapPage')">
+   <span class="ico">🗺️</span>
+   <b>Map & GPS</b>
+   <small>Reba aho uri n'inzira</small>
+  </button>
+
+  <button class="service" onclick="openPage('payment')">
+   <span class="ico">💰</span>
+   <b>Kwishyura</b>
+   <small>Ohereza ubwishyu</small>
+  </button>
+
+  <button class="service" onclick="openPage('trips')">
+   <span class="ico">🛣️</span>
+   <b>Ingendo</b>
+   <small>Ingendo zawe</small>
+  </button>
+
+  <button class="service" onclick="openPage('market')">
+   <span class="ico">🛒</span>
+   <b>Marketplace</b>
+   <small>Gura cyangwa ugurishe</small>
+  </button>
+
+  <button class="service" onclick="openPage('motorcycles')">
+   <span class="ico">🏍️</span>
+   <b>Amamoto</b>
+   <small>Amamoto ari kugurishwa</small>
+  </button>
+
+  <button class="service" onclick="openPage('business')">
+   <span class="ico">🏪</span>
+   <b>Ubucuruzi</b>
+   <small>Shaka serivisi</small>
+  </button>
+
+  <button class="service" onclick="openPage('notifications')">
+   <span class="ico">🔔</span>
+   <b>Notifications</b>
+   <small>Ubutumwa bwawe</small>
+  </button>
+
+ </div>
+
+ <div class="card">
+  <h3>⚡ Serivisi yihuse</h3>
+  <button class="primary" onclick="quickRide()">🏍️ Saba Motari nonaha</button>
+  <button class="secondary" onclick="locateMe()">📍 Menya aho ndi</button>
+ </div>
+
+</section>
+
+<!-- RIDERS -->
+<section id="riders" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>🏍️ Shaka Motari</h2>
+ <button class="primary" onclick="findNearbyRiders()">📍 Shaka abamotari bakwegereye</button>
+ <div id="riderStatus" class="notice">Kanda hejuru kugira ngo dushakishe abamotari.</div>
+ <div id="riderList"></div>
+</section>
+
+<!-- MAP -->
+<section id="mapPage" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>🗺️ Map & GPS</h2>
+ <button class="primary" onclick="locateMe()">📍 Menya aho ndi</button>
+ <div id="map"></div>
+ <div class="card">
+  <h3>🛣️ Aho ujya</h3>
+  <input id="destination" placeholder="Urugero: Kigali City Market">
+  <button class="primary" onclick="findRoute()">Shaka inzira</button>
+  <div id="routeResult" class="notice">Nta nzira irashakwa.</div>
+ </div>
+</section>
+
+<!-- PAYMENT -->
+<section id="payment" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>💰 Kwishyura</h2>
+ <div class="card">
+  <div class="notice">Andika amafaranga ushaka kwishyura.</div>
+  <label>Amafaranga (RWF)</label>
+  <input id="paymentAmount" type="number" min="100" placeholder="Urugero: 1000">
+  <label>Impamvu yo kwishyura</label>
+  <select id="paymentPurpose">
+   <option value="ride">Urugendo</option>
+   <option value="listing">Marketplace</option>
+   <option value="business">Ubucuruzi</option>
+   <option value="other">Ikindi</option>
+  </select>
+  <label>Reference ya Mobile Money</label>
+  <input id="paymentReference" placeholder="Andika reference nyuma yo kwishyura">
+  <button class="primary" onclick="submitPayment()">💸 Ohereza ubwishyu</button>
+  <div id="paymentStatus"></div>
+ </div>
+ <div class="notice">
+  🔐 Amakuru y'ibanga ya payment ntashyirwa muri frontend.
+  Aho kuyashyira hazasimbuzwa backend/payment API.
+ </div>
+</section>
+
+<!-- TRIPS -->
+<section id="trips" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>🛣️ Ingendo zanjye</h2>
+ <div id="tripList"></div>
+</section>
+
+<!-- MARKET -->
+<section id="market" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>🛒 Marketplace</h2>
+ <input id="marketSearch" placeholder="🔎 Shaka igicuruzwa...">
+ <div id="marketList"></div>
+ <button class="primary" onclick="requireLogin(openAddListing)">+ Shyiraho igicuruzwa</button>
+</section>
+
+<!-- MOTORCYCLES -->
+<section id="motorcycles" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>🏍️ Amamoto</h2>
+ <div id="motorcycleList"></div>
+ <button class="primary" onclick="requireLogin(openAddMotorcycle)">+ Shyiraho Moto</button>
+</section>
+
+<!-- BUSINESS -->
+<section id="business" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>🏪 Ubucuruzi</h2>
+ <input id="businessSearch" placeholder="🔎 Shaka business...">
+ <div id="businessList"></div>
+ <button class="primary" onclick="requireLogin(openAddBusiness)">+ Shyiraho Ubucuruzi</button>
+</section>
+
+<!-- NOTIFICATIONS -->
+<section id="notifications" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>🔔 Notifications</h2>
+ <div id="notificationList"></div>
+</section>
+
+<!-- PROFILE -->
+<section id="profile" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>👤 Profile</h2>
+ <div id="profileContent"></div>
+</section>
+
+<!-- ADMIN -->
+<section id="admin" class="hidden">
+ <button class="back" onclick="goHome()">← Ahabanza</button>
+ <h2>👑 Admin / Owner</h2>
+ <div id="adminContent"></div>
+</section>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom">
+ <button onclick="goHome()">🏠<small>Ahabanza</small></button>
+ <button onclick="openPage('riders')">🏍️<small>Moto</small></button>
+ <button onclick="openPage('mapPage')">🗺️<small>Map</small></button>
+ <button onclick="openPage('notifications')">🔔<small>Ubutumwa</small></button>
+ <button onclick="openProfile()">👤<small>Profile</small></button>
+</nav>
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal hidden">
+ <div class="modal-box">
+  <div class="auth-logo">🏍️</div>
+  <h2 id="authTitle">Injira muri konti</h2>
+  <input id="authName" placeholder="Amazina yawe" style="display:none">
+  <input id="authEmail" type="email" placeholder="Email">
+  <input id="authPassword" type="password" placeholder="Password">
+  <button class="primary" onclick="handleAuth()" id="authButton">Injira</button>
+  <button class="secondary" onclick="toggleAuthMode()" id="authSwitch">Nta konti mfite — Iyandikishe</button>
+  <button class="back" onclick="closeAuth()">Funga</button>
+  <div id="authMessage"></div>
+ </div>
+</div>
+
+<!-- GENERIC MODAL -->
+<div id="modal" class="modal hidden">
+ <div class="modal-box">
+  <div id="modalContent"></div>
+  <button class="back" onclick="closeModal()">Funga</button>
+ </div>
+</div>
+
+<script>
+/* Shared in-memory app state, available to every module before they load. */
+window.App = {
+  currentUser: null,
+  lastKnownPosition: null,
+  data: {
+    riders: [],
+    trips: [],
+    listings: [],
+    motorcycles: [],
+    businesses: [],
+    notifications: [],
+    payments: []
+  }
+};
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script type="module" src="firebase.js"></script>
+<script type="module" src="render.js"></script>
+<script type="module" src="auth.js"></script>
+<script type="module" src="rides.js"></script>
+<script type="module" src="payment.js"></script>
+<script type="module" src="map.js"></script>
+<script type="module" src="marketplace.js"></script>
+<script type="module" src="notifications.js"></script>
+<script type="module" src="admin.js"></script>
+<script type="module" src="input.js"></script>
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
